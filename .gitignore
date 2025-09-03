@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# VSCode settings
+.vscode/
+
+# Dependency files
+*.egg-info/
+.eggs/
+*.egg
+
+# Build / distribution
+build/
+dist/
+*.manifest
+*.spec
+
+# Jupyter / notebook checkpoints
+.ipynb_checkpoints
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# OS specific
+.DS_Store
+Thumbs.db
