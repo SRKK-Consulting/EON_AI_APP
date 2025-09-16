@@ -1,44 +1,47 @@
-import os
-import requests
+from azure.ai.projects import AIProjectClient
+from azure.identity import DefaultAzureCredential
+from azure.ai.agents.models import ListSortOrder
 
-# ============================
-# Setup
-# ============================
-BING_API_KEY = os.getenv("BING_API_KEY")  # make sure this is set
-BING_ENDPOINT = "https://api.bing.microsoft.com/v7.0/news/search"
+# Create a client pointing to your Azure AI Foundry project
+project = AIProjectClient(
+    credential=DefaultAzureCredential(),
+    endpoint="https://aiserver1234.services.ai.azure.com/api/projects/SALES_CHATBOT_POC"
+)
 
-def search_news(query: str, count: int = 5):
-    """Search Bing News for the given query."""
-    headers = {"Ocp-Apim-Subscription-Key": BING_API_KEY}
-    params = {"q": query, "count": count, "mkt": "en-US", "freshness": "Day"}
-    
-    response = requests.get(BING_ENDPOINT, headers=headers, params=params)
-    response.raise_for_status()
-    data = response.json()
+# Get the agent by ID
+agent = project.agents.get_agent("asst_ZkzK0inGhhkrf5NFXOsHetRU")
 
-    results = []
-    for article in data.get("value", []):
-        results.append({
-            "name": article.get("name"),
-            "url": article.get("url"),
-            "snippet": article.get("description"),
-            "provider": article.get("provider", [{}])[0].get("name", "Unknown"),
-            "datePublished": article.get("datePublished"),
-        })
-    return results
+# Create a conversation thread
+thread = project.agents.threads.create()
+print(f"✅ Created thread, ID: {thread.id}")
 
+# Send a user message
+project.agents.messages.create(
+    thread_id=thread.id,
+    role="user",
+    content="Hi Agent158. Tell me the weather forecast in kuala lumpur on 10 Sept 2025"
+)
 
-# ============================
-# Example usage
-# ============================
-if __name__ == "__main__":
-    for industry in ["oil and gas", "maritime"]:
-        print(f"\n🔎 Latest news on {industry}:\n")
-        try:
-            news = search_news(f"latest {industry} industry", count=5)
-            for n in news:
-                print(f"- {n['name']} ({n['provider']})")
-                print(f"  {n['snippet']}")
-                print(f"  {n['url']}\n")
-        except Exception as e:
-            print(f"Error searching news for {industry}: {e}")
+# Run the agent
+run = project.agents.runs.create_and_process(
+    thread_id=thread.id,
+    agent_id=agent.id
+)
+
+# Check run status
+if run.status == "failed":
+    print(f"❌ Run failed: {run.last_error}")
+else:
+    print("✅ Run completed successfully. Conversation so far:\n")
+
+    # Fetch all messages in order
+    messages = project.agents.messages.list(
+        thread_id=thread.id,
+        order=ListSortOrder.ASCENDING
+    )
+
+    for message in messages:
+        if message.text_messages:
+            text = message.text_messages[-1].text.value
+            print(f"{message.role}: {text}")
+

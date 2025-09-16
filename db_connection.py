@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from azure.identity import InteractiveBrowserCredential
+from azure.identity import DefaultAzureCredential
 import sqlalchemy as sa
 import urllib
 import struct
@@ -12,7 +12,7 @@ load_dotenv()
 RESOURCE_URL = "https://database.windows.net/.default"
 
 # Interactive login (will open browser if needed)
-credential = InteractiveBrowserCredential()
+credential = DefaultAzureCredential()
 
 token_object = credential.get_token(RESOURCE_URL)
 auth_token = token_object.token
