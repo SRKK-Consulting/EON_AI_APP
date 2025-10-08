@@ -7,7 +7,7 @@ Scenario-driven demo for a Chainlit + langgraph sales analytics assistant that q
 The app is organized as a small pipeline (a StateGraph) with these logical nodes:
 
 - orchestrator: parses the user query (via an LLM) and decides which agent nodes to run. It returns filters and an array of agent IDs to execute (strings: `"1"`, `"2"`, `"3"`).
-- `agent1` (Data Agent): builds a T-SQL `SELECT` (via LLM + schema) and retrieves open deals from the Fabric Lakehouse using the SQLAlchemy `engine`.
+- `agent1` (Data Agent): builds a T-SQL `SELECT` (via LLM + schema) and retrieves open deals from the Fabric Lakehouse using the SQLAlchemy `engine`. Can be replaced with Data Agent in Fabric. 
 - `agent2` (ML Prediction Agent): runs a sales-classification ML model (the production model used to predict deal outcomes) and returns a probability that the deal will win or lose. These probabilities are explainable using SHAP values/ratios — `agent2` fetches SHAP rows for retrieved deals and uses the LLM to prepare plain-English explanations that list top positive and negative drivers and provide one actionable suggestion.
 - `agent3` (News agent): queries an Azure AI Projects agent to obtain recent industry/customer news snippets. The news agent uses customer information returned by `agent1` (for example `customer_name` and `customer_industry`) to target searches and return snippets specific to the customers and industries found in the retrieved deals.
 - synthesizer: compiles the collected outputs into a structured Markdown manager note (MEDDIC-aligned) and sends it to Chainlit.
