@@ -174,9 +174,3 @@ If the LLM returns invalid JSON the orchestrator falls back to default agents (`
 
 ---
 
-If you'd like, I can:
-
-1. Add a small smoke test that runs `orchestrator_node` with a mocked LLM to demonstrate routing for the three scenarios.
-2. Refactor `db_connection.py` to move token retrieval into a factory function (recommended for testability).
-
-Tell me which you'd prefer and I'll make the changes and run the tests locally.
